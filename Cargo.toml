@@ -1,0 +1,5 @@
+[package]
+
+name = "sudokrust"
+version = "0.0.1"
+authors = ["Stan Rozenraukh <stan@stanistan.com>"]
