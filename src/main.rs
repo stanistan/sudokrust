@@ -1,7 +1,7 @@
 
 extern crate sudokrust;
 
-use sudokrust::grid::{Grid};
+use sudokrust::grid::{Grid,Validatable};
 use sudokrust::position::{Position};
 
 fn main() {
@@ -17,6 +17,7 @@ fn main() {
     println!("value at 1-1 = {:?}", grid.value_at_coordinates(1, 1));
 
     // we want to have an arbitrary grid with values/
+    println!("is this shit valid? {:?}", grid.is_valid());
 
 
 

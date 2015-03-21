@@ -4,11 +4,11 @@ use std::collections::{HashMap,HashSet};
 use config::{is_valid, full_range};
 use position::{Position,Positions};
 
-trait Evaluatable {
+pub trait Validatable {
     fn is_valid(&self) -> bool;
 }
 
-impl Evaluatable for i8 {
+impl Validatable for i8 {
     fn is_valid(&self) -> bool {
         is_valid(*self)
     }
@@ -16,7 +16,7 @@ impl Evaluatable for i8 {
 
 pub type GridValue = Option<i8>;
 
-impl Evaluatable for GridValue {
+impl Validatable for GridValue {
     fn is_valid(&self) -> bool {
         match self {
             &Some(value) => value.is_valid(),
@@ -27,7 +27,7 @@ impl Evaluatable for GridValue {
 
 pub type GridValues = Vec<GridValue>;
 
-impl Evaluatable for GridValues {
+impl Validatable for GridValues {
 
     fn is_valid(&self) -> bool {
 
@@ -117,9 +117,10 @@ impl fmt::Display for Grid {
     }
 }
 
-impl Evaluatable for Grid {
+impl Validatable for Grid {
 
     fn is_valid(&self) -> bool {
+
         for i in full_range() {
             if !self.values_for_square(i).is_valid() {
                 return false;
