@@ -1,4 +1,3 @@
-
 use std::hash::{Hash, Hasher};
 use std::fmt;
 
@@ -11,6 +10,7 @@ pub struct Position {
 }
 
 pub type Positions = Vec<Position>;
+pub type Regions = Vec<Positions>;
 
 impl Position {
 
@@ -35,29 +35,62 @@ impl Position {
         Position::for_xs_ys(full_range(), full_range())
     }
 
-    pub fn for_column(x: i8) -> Positions {
-        Position::for_xs_ys(vec![x], full_range())
+    pub fn for_column(column: i8) -> Positions {
+        Position::for_xs_ys(vec![column], full_range())
     }
 
-    pub fn for_row(y: i8) -> Positions {
-        Position::for_xs_ys(full_range(), vec![y])
+    fn column(&self) -> i8{
+        self.x
     }
 
-    pub fn for_square(n: i8) -> Positions {
+    pub fn for_row(row: i8) -> Positions {
+        Position::for_xs_ys(full_range(), vec![row])
+    }
+
+    fn row(&self) -> i8 {
+        self.y
+    }
+
+    pub fn for_square(square: i8) -> Positions {
         Position::for_xs_ys(
-            match n {
+            match square {
                 1|4|7 => vec![1, 2, 3],
                 2|5|8 => vec![4, 5, 6],
                 3|6|9 => vec![7, 8, 9],
                 _ => vec![]
             },
-            match n {
+            match square {
                 1|2|3 => vec![1, 2, 3],
                 4|5|6 => vec![4, 5, 6],
                 7|8|9 => vec![7, 8, 9],
                 _ => vec![]
             }
         )
+    }
+
+    fn square(&self) -> i8 {
+        for i in full_range() {
+            for position in Position::for_square(i) {
+                if position == *self {
+                    return i
+                }
+            }
+        }
+        assert!(
+            false,
+            "Some how positions are invalid. We should have failed much earlier"
+        );
+        0
+    }
+
+    // we need a bunch of regions to know how to generate
+    // a grid, and validate its contents
+    pub fn relevant_regions(&self) -> Regions {
+        vec![
+            Position::for_column(self.column()),
+            Position::for_row(self.row()),
+            Position::for_square(self.square())
+        ]
     }
 
 }

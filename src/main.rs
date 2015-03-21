@@ -19,6 +19,7 @@ fn main() {
     // we want to have an arbitrary grid with values/
     println!("is this shit valid? {:?}", grid.is_valid());
 
-
+    let position = Position::new(1,1);
+    println!("regions: {:?}", position.relevant_regions());
 
 }

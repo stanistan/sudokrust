@@ -2,7 +2,7 @@ use std::fmt;
 use std::collections::{HashMap,HashSet};
 
 use config::{is_valid, full_range};
-use position::{Position,Positions};
+use position::{Position,Positions,Regions};
 
 pub trait Validatable {
     fn is_valid(&self) -> bool;
