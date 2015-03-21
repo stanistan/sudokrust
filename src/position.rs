@@ -2,6 +2,8 @@
 use std::hash::{Hash, Hasher};
 use std::fmt;
 
+use config::{MIN_POS,MAX_POS};
+
 #[derive(PartialEq, Eq, Debug)]
 pub struct Position {
     x: i8,
@@ -18,8 +20,8 @@ impl Position {
     }
 
     fn assert_valid_value(value: i8) -> i8 {
-        assert!(value > 0);
-        assert!(value < 10);
+        assert!(value >= MIN_POS);
+        assert!(value < MAX_POS);
         value
     }
 

@@ -2,9 +2,8 @@
 use std::fmt;
 use std::collections::HashMap;
 
-// extern crate sudokrust;
-
 use position::{Position};
+use config::{MIN_POS,MAX_POS};
 
 #[derive(Debug)]
 pub struct Grid {
@@ -16,8 +15,8 @@ impl Grid {
     pub fn new() -> Grid {
 
         let mut map = HashMap::new();
-        for x in 1..10 {
-            for y in 1..10 {
+        for x in MIN_POS..MAX_POS {
+            for y in MIN_POS..MAX_POS {
                 let position = Position::new(x, y);
                 map.insert(position, None);
             }
@@ -47,6 +46,8 @@ impl Grid {
         let position = Position::new(x, y);
         self.insert(position, value)
     }
+
+
 
 }
 
