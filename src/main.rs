@@ -1,7 +1,8 @@
 
 extern crate sudokrust;
 
-use sudokrust::grid::{Grid,Validatable};
+use sudokrust::traits::{Validatable};
+use sudokrust::grid::{Grid};
 use sudokrust::position::{Position};
 
 fn main() {

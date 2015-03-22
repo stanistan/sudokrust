@@ -1,21 +1,11 @@
 use std::fmt;
 use std::collections::{HashMap,HashSet};
 
-use config::{is_valid, full_range};
-use position::{Position,Positions,Regions};
-
-pub trait Validatable {
-    fn is_valid(&self) -> bool;
-}
-
-impl Validatable for i8 {
-    fn is_valid(&self) -> bool {
-        is_valid(*self)
-    }
-}
+use config::{full_range};
+use traits::{Validatable};
+use position::{Position,Positions};
 
 pub type GridValue = Option<i8>;
-
 impl Validatable for GridValue {
     fn is_valid(&self) -> bool {
         match self {
@@ -26,7 +16,6 @@ impl Validatable for GridValue {
 }
 
 pub type GridValues = Vec<GridValue>;
-
 impl Validatable for GridValues {
 
     fn is_valid(&self) -> bool {
