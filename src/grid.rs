@@ -54,6 +54,26 @@ pub struct Grid {
     map: HashMap<Position,GridValue>
 }
 
+impl Clone for Grid {
+
+    fn clone(&self) -> Grid {
+        let mut map = HashMap::new();
+        for position in Position::all() {
+            map.insert(position, self.get(position));
+        }
+        Grid { map: map }
+    }
+
+    fn clone_from(&mut self, source: &Grid) {
+        let mut map = HashMap::new();
+        for position in Position::all() {
+            map.insert(position, source.get(position));
+        }
+        self.map = map;
+    }
+
+}
+
 impl Grid {
 
     pub fn new() -> Grid {
@@ -108,11 +128,37 @@ impl Grid {
         self.values(Position::for_square(n))
     }
 
+    pub fn empty_positions(&self) -> Positions {
+        let mut positions = Vec::new();
+        for position in Position::all() {
+            if self.get(position).is_none() {
+                positions.push(position);
+            }
+        }
+        positions
+    }
+
 }
 
 impl fmt::Display for Grid {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Grid.map{:?}", self.map)
+        let mut result = write!(f, "#SudokuGrid\n");
+        let mut last_y = 0;
+        for y in 1..10 {
+            if y != last_y {
+                    result = write!(f, "\n");
+                    last_y = y
+                }
+            for x in 1..10 {
+                let value = self.value_at_coordinates(x, y);
+                if value.is_none() {
+                    result = write!(f, "_ ");
+                } else {
+                    result = write!(f, "{} ", value.unwrap());
+                }
+            }
+        }
+        result
     }
 }
 

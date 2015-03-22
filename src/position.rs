@@ -4,7 +4,7 @@ use std::fmt;
 use config::{full_range};
 use traits::{Validatable,are_many_valid};
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Copy)]
 pub struct Position {
     x: i8,
     y: i8
