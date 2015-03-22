@@ -63,7 +63,7 @@ pub fn solve(grid: Grid) -> Result<Grid,SolverError> {
                 match solve(next_grid) {
                     Ok(grid) => return Ok(grid),
                     Err(SolverError::Unknown) => return Err(SolverError::Unknown),
-                    _ => break 'outer
+                    _ => continue
                 };
             }
         }

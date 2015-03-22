@@ -56,13 +56,13 @@ impl Position {
                 1|4|7 => vec![1, 2, 3],
                 2|5|8 => vec![4, 5, 6],
                 3|6|9 => vec![7, 8, 9],
-                _ => vec![]
+                _ => unreachable!()
             },
             match square {
                 1|2|3 => vec![1, 2, 3],
                 4|5|6 => vec![4, 5, 6],
                 7|8|9 => vec![7, 8, 9],
-                _ => vec![]
+                _ => unreachable!()
             }
         )
     }
@@ -75,11 +75,7 @@ impl Position {
                 }
             }
         }
-        assert!(
-            false,
-            "Some how positions are invalid. We should have failed much earlier"
-        );
-        0
+        unreachable!()
     }
 
     // we need a bunch of regions to know how to generate

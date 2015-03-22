@@ -4,6 +4,7 @@ use std::collections::{HashMap,HashSet};
 use config::{full_range};
 use traits::{AsSet,Validatable,are_many_valid,are_sets_equal};
 use position::{Position,Positions};
+use difficulty::{Difficulty};
 
 pub type GridValue = Option<i8>;
 
@@ -142,27 +143,41 @@ impl Grid {
         self.empty_positions().len() == 0
     }
 
+    pub fn remove_values_for_difficulty(&mut self, difficulty: Difficulty) {
+
+        let mut num_to_remove = difficulty.num_to_remove();
+        while num_to_remove > 0 {
+            num_to_remove -= 1;
+        }
+    }
+
 }
 
+// I hate everything about this.
 impl fmt::Display for Grid {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut result = write!(f, "#SudokuGrid\n#");
-        let mut last_y = 0;
+        let mut last_y = 1;
         for y in 1..10 {
             if y != last_y {
-                    result = write!(f, "\n");
-                    last_y = y
+                try!(write!(f, "\n"));
+                if y % 3 == 1 && y > 1 {
+                    try!(write!(f, "-----------\n"));
                 }
+                last_y = y
+            }
             for x in 1..10 {
+                if x % 3 == 1 && x > 1 {
+                    try!(write!(f, "|"));
+                }
                 let value = self.value_at_coordinates(x, y);
                 if value.is_none() {
-                    result = write!(f, "_ ");
+                    try!(write!(f, "."));
                 } else {
-                    result = write!(f, "{} ", value.unwrap());
+                    try!(write!(f, "{}", value.unwrap()));
                 }
             }
         }
-        result
+        Ok(())
     }
 }
 

@@ -3,3 +3,6 @@
 name = "sudokrust"
 version = "0.0.1"
 authors = ["Stan Rozenraukh <stan@stanistan.com>"]
+
+[dependencies]
+getopts = "0.2.4"
