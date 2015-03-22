@@ -1,7 +1,8 @@
 use std::hash::{Hash, Hasher};
 use std::fmt;
 
-use config::{full_range,assert_valid_value};
+use config::{full_range};
+use traits::{Validatable,are_many_valid};
 
 #[derive(PartialEq, Eq, Debug)]
 pub struct Position {
@@ -10,15 +11,13 @@ pub struct Position {
 }
 
 pub type Positions = Vec<Position>;
+
 pub type Regions = Vec<Positions>;
 
 impl Position {
 
     pub fn new(x: i8, y: i8) -> Position {
-        Position {
-            x: assert_valid_value(x),
-            y: assert_valid_value(y)
-        }
+        Position { x: x, y: y }
     }
 
     pub fn for_xs_ys(xs: Vec<i8>, ys: Vec<i8>) -> Positions {
@@ -39,7 +38,7 @@ impl Position {
         Position::for_xs_ys(vec![column], full_range())
     }
 
-    fn column(&self) -> i8{
+    pub fn column(&self) -> i8{
         self.x
     }
 
@@ -47,7 +46,7 @@ impl Position {
         Position::for_xs_ys(full_range(), vec![row])
     }
 
-    fn row(&self) -> i8 {
+    pub fn row(&self) -> i8 {
         self.y
     }
 
@@ -68,7 +67,7 @@ impl Position {
         )
     }
 
-    fn square(&self) -> i8 {
+    pub fn square(&self) -> i8 {
         for i in full_range() {
             for position in Position::for_square(i) {
                 if position == *self {
@@ -105,5 +104,23 @@ impl Hash for Position {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.x.hash(state);
         self.y.hash(state);
+    }
+}
+
+impl Validatable for Position {
+    fn is_valid(&self) -> bool {
+        self.x.is_valid() && self.y.is_valid()
+    }
+}
+
+impl Validatable for Positions {
+    fn is_valid(&self) -> bool {
+        are_many_valid(self)
+    }
+}
+
+impl Validatable for Regions {
+    fn is_valid(&self) -> bool {
+        are_many_valid(self)
     }
 }

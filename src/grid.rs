@@ -2,10 +2,11 @@ use std::fmt;
 use std::collections::{HashMap,HashSet};
 
 use config::{full_range};
-use traits::{Validatable};
+use traits::{AsSet,Validatable,are_many_valid,are_sets_equal};
 use position::{Position,Positions};
 
 pub type GridValue = Option<i8>;
+
 impl Validatable for GridValue {
     fn is_valid(&self) -> bool {
         match self {
@@ -15,28 +16,37 @@ impl Validatable for GridValue {
     }
 }
 
+impl AsSet for GridValue {
+    fn as_set(&self) -> HashSet<i8> {
+        match self {
+            &Some(value) => value.as_set(),
+            _ => HashSet::new()
+        }
+    }
+}
+
 pub type GridValues = Vec<GridValue>;
+
 impl Validatable for GridValues {
-
     fn is_valid(&self) -> bool {
+        if are_many_valid(self) {
+            let full_range_values = full_range();
+            return are_sets_equal(&full_range_values.as_set(), &self.as_set());
+        }
+        false
+    }
+}
 
+impl AsSet for GridValues {
+    fn as_set(&self) -> HashSet<i8> {
+        let mut set = HashSet::new();
         for value in self {
-            if !value.is_valid() {
-                return false;
+            if value.is_some() {
+                set.insert(value.unwrap());
             }
         }
-
-        let mut values = HashSet::new();
-        for value in self {
-            values.insert(value.unwrap());
-        }
-
-        let valid_values: HashSet<_> = full_range().iter().cloned().collect();
-        let intersection: HashSet<_> = valid_values.intersection(&values).collect();
-
-        intersection.len() == valid_values.len()
+        set
     }
-
 }
 
 #[derive(Debug)]
