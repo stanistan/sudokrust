@@ -138,11 +138,15 @@ impl Grid {
         positions
     }
 
+    pub fn is_full(&self) -> bool {
+        self.empty_positions().len() == 0
+    }
+
 }
 
 impl fmt::Display for Grid {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut result = write!(f, "#SudokuGrid\n");
+        let mut result = write!(f, "#SudokuGrid\n#");
         let mut last_y = 0;
         for y in 1..10 {
             if y != last_y {

@@ -16,9 +16,13 @@ impl Possibilities {
 
     pub fn remove_possible_values(&mut self, values: GridValues) {
         for value in values.as_set() {
-            if self.values.contains(&value) {
-                self.values.remove(&value);
-            }
+            self.remove_possible_value(value);
+        }
+    }
+
+    fn remove_possible_value(&mut self, value: i8) {
+        if self.values.contains(&value) {
+            self.values.remove(&value);
         }
     }
 
@@ -26,52 +30,49 @@ impl Possibilities {
         self.values.len()
     }
 
-    // gets the first one, we can go random if we really
-    // feel like it.
-    pub fn pick_value(&self) -> Option<i8> {
-        for val in self.values.clone() {
-            return Some(val);
-        }
-        None
-    }
-
 }
 
-pub fn solve(grid: Grid) -> Option<Grid> {
+#[derive(Debug)]
+pub enum SolverError { Contradiction, Unknown }
 
-    // pretty easy to start with,
-    // check if the puzzle is already solved.
+pub fn solve(grid: Grid) -> Result<Grid,SolverError> {
+
     if grid.is_valid() {
-        return Some(grid);
+        return Ok(grid);
+    }
+
+    if grid.is_full() {
+        return Err(SolverError::Unknown);
     }
 
     // we need to find the position in the grid with the
     // least amount of possibilities
     let positions = grid.empty_positions();
     let ordered = ordered_positions(positions, grid.clone());
-    for (_, possibilities) in ordered.iter() {
-        for possibility in possibilities {
-            let value = possibility.pick_value();
-            if !value.is_none() {
-                let mut next_grid: Grid = grid.clone();
-                next_grid.insert(possibility.position, value);
-                let maybe_solved = solve(next_grid);
-                if maybe_solved.is_none() {
-                    continue;
-                } else {
-                    return maybe_solved;
-                }
+    if ordered.is_none() {
+        return Err(SolverError::Contradiction);
+    }
+
+    for (_, possibilities) in ordered.unwrap().iter() {
+        'outer: for possibility in possibilities {
+            for value in possibility.values.iter() {
+
+                let mut next_grid = grid.clone();
+                next_grid.insert(possibility.position, Some(*value));
+
+                match solve(next_grid) {
+                    Ok(grid) => return Ok(grid),
+                    Err(SolverError::Unknown) => return Err(SolverError::Unknown),
+                    _ => break 'outer
+                };
             }
         }
     }
-    // println!("Ordered Positions: {}",ordered.len());
 
-
-    // if we cant solve it, or something.
-    None
+    Err(SolverError::Unknown)
 }
 
-fn ordered_positions(positions: Positions, grid: Grid) -> BTreeMap<usize,Vec<Possibilities>> {
+fn ordered_positions(positions: Positions, grid: Grid) -> Option<BTreeMap<usize,Vec<Possibilities>>> {
 
     let mut map = BTreeMap::new();
     let full_range_values = full_range().as_set();
@@ -88,6 +89,11 @@ fn ordered_positions(positions: Positions, grid: Grid) -> BTreeMap<usize,Vec<Pos
             possibilities.remove_possible_values(grid.values(region));
         }
 
+        // this means we've hit a contradictory situtation
+        if possibilities.len() == 0 {
+            return None;
+        }
+
         let mut possibilities_at_len = match map.entry(possibilities.len()) {
             Entry::Vacant(entry) => entry.insert(Vec::new()),
             Entry::Occupied(entry) => entry.into_mut()
@@ -95,5 +101,6 @@ fn ordered_positions(positions: Positions, grid: Grid) -> BTreeMap<usize,Vec<Pos
 
         possibilities_at_len.push(possibilities);
     }
-    map
+
+    Some(map)
 }
