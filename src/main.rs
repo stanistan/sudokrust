@@ -54,8 +54,7 @@ fn main() {
         println!("Grid written to file: {}", matches.opt_str("w").unwrap());
     }
 
-    // print out the puzzle.
-    println!("{}", solved);
+    println!("\n\n\n{}\n\n\n", solved);
 }
 
 fn print_usage(program: &str, opts: Options) {
