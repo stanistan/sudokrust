@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashSet};
 use std::collections::btree_map::{BTreeMap, Entry};
 
 use config::{full_range};
@@ -20,7 +20,7 @@ impl Possibilities {
         }
     }
 
-    fn remove_possible_value(&mut self, value: i8) {
+    pub fn remove_possible_value(&mut self, value: i8) {
         if self.values.contains(&value) {
             self.values.remove(&value);
         }
@@ -33,9 +33,17 @@ impl Possibilities {
 }
 
 #[derive(Debug)]
-pub enum SolverError { Contradiction, Unknown }
+pub enum SolverError {
+    Contradiction,
+    OutOfOptions,
+    Unknown
+}
 
 pub fn solve(grid: Grid) -> Result<Grid,SolverError> {
+    solve_grid(grid, 0)
+}
+
+fn solve_grid(grid: Grid, level: usize) -> Result<Grid,SolverError> {
 
     if grid.is_valid() {
         return Ok(grid);
@@ -45,31 +53,36 @@ pub fn solve(grid: Grid) -> Result<Grid,SolverError> {
         return Err(SolverError::Unknown);
     }
 
-    // we need to find the position in the grid with the
-    // least amount of possibilities
-    let positions = grid.empty_positions();
-    let ordered = ordered_positions(positions, grid.clone());
+    let ordered = ordered_positions(grid.empty_positions(), grid.clone());
     if ordered.is_none() {
         return Err(SolverError::Contradiction);
     }
 
-    for (_, possibilities) in ordered.unwrap().iter() {
-        'outer: for possibility in possibilities {
+    let unwrapped_ordered = ordered.unwrap();
+    let possible_values = unwrapped_ordered.values();
+
+    for possibilities in possible_values {
+        for possibility in possibilities {
+            let position: Position = possibility.position;
             for value in possibility.values.iter() {
 
                 let mut next_grid = grid.clone();
-                next_grid.insert(possibility.position, Some(*value));
+                next_grid.insert(position, Some(*value));
 
-                match solve(next_grid) {
+                match solve_grid(next_grid, level + 1) {
                     Ok(grid) => return Ok(grid),
                     Err(SolverError::Unknown) => return Err(SolverError::Unknown),
+                    Err(SolverError::OutOfOptions) => match level {
+                        0 => continue,
+                        _ => return Err(SolverError::OutOfOptions)
+                    },
                     _ => continue
                 };
             }
         }
     }
 
-    Err(SolverError::Unknown)
+    Err(SolverError::OutOfOptions)
 }
 
 fn ordered_positions(positions: Positions, grid: Grid) -> Option<BTreeMap<usize,Vec<Possibilities>>> {
