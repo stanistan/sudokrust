@@ -151,6 +151,39 @@ impl Grid {
         }
     }
 
+    //
+    // from: http://www.sudocue.net/fileformats.php
+    // following .ss format,
+    // which is the format that I'm writing.
+    // we can generate a grid.
+    pub fn from_string(string: String) -> Grid {
+
+        let mut grid = Grid::new();
+        let mut y = 1;
+
+        'line: for line in string.as_slice().lines() {
+            let mut x = 0;
+            for ch in line.split("") {
+                if ch == "-" {
+                    continue 'line;
+                }
+                if ch == "." {
+                    x += 1;
+                    grid.insert_at_coordinates(x, y, None);
+                    continue;
+                }
+                let num = ::std::str::FromStr::from_str(ch).ok();
+                if num.is_some() {
+                    x += 1;
+                    grid.insert_at_coordinates(x, y, num);
+                }
+
+            }
+            y += 1;
+        }
+        grid
+    }
+
 }
 
 // I hate everything about this.
